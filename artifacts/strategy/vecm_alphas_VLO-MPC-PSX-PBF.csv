@@ -1,0 +1,5 @@
+ticker,alpha,error_estandar,t,significativo_5pct,corrige_desequilibrio
+VLO,-0.018183,0.005811,-3.1292,True,True
+MPC,-0.006657,0.004623,-1.4398,False,True
+PSX,0.00163,0.005879,0.2772,False,False
+PBF,-0.007564,0.003353,-2.2561,True,True

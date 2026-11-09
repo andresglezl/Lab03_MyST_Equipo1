@@ -1,0 +1,5 @@
+ticker,alpha,error_estandar,t,significativo_5pct,corrige_desequilibrio
+RY,0.009761,0.012644,0.772,False,False
+TD,0.000107,0.009138,0.0117,False,False
+BMO,0.03164,0.012709,2.4895,True,False
+CM,0.003625,0.006895,0.5257,False,False

@@ -1,0 +1,7 @@
+k_rezagos,phi,vida_media_dias,ljungbox_rezagos,ljungbox_pvalue,residuales_blancos,elegido
+1,-0.01892,36.29,11,0.27802,True,True
+2,-0.018228,37.68,12,0.541842,True,False
+3,-0.018291,37.55,13,0.601227,True,False
+5,-0.017865,38.45,15,0.474313,True,False
+8,-0.0169,40.67,18,0.992708,True,False
+10,-0.017039,40.33,20,0.997783,True,False

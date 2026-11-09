@@ -1,0 +1,5 @@
+particion,pnl_bruto,comisiones,prestamo,pnl_neto,residuo_identidad,costos_sobre_bruto,costos_sobre_capital_medio
+entrenamiento,188635.23,51808.77,2781.41,134045.05,0.0,0.289395,0.050813
+prueba,-2042.38,26130.59,1255.9,-29428.86,0.0,,0.024408
+validacion,-49198.25,20060.94,1299.51,-70558.7,0.0,,0.020381
+global,137394.6,98000.3,5336.82,34057.49,-0.0,0.752119,0.095806

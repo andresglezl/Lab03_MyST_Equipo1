@@ -1,0 +1,621 @@
+{
+  "corrida": {
+    "id": "20261107T235441",
+    "fecha_ejecucion": "2026-11-07T23:54:41",
+    "python": "3.12.4",
+    "paquetes": {
+      "numpy": "1.26.4",
+      "pandas": "2.2.2",
+      "scipy": "1.13.1",
+      "statsmodels": "0.14.2",
+      "yfinance": "1.7.0"
+    }
+  },
+  "parametros": {
+    "semilla": 42,
+    "fecha_inicio": "2012-12-13",
+    "fecha_fin": "2026-11-06",
+    "division": {
+      "entrenamiento": 0.6,
+      "prueba": 0.2,
+      "validacion": 0.2
+    },
+    "capital_inicial": 1000000.0,
+    "comision_por_pata": 0.00125,
+    "tasa_prestamo_anual": 0.0025,
+    "dias_devengo_prestamo": 365,
+    "dias_anualizacion": 252,
+    "exposicion_maxima": 0.8,
+    "correlacion_minima": 0.7,
+    "pvalue_maximo": 0.05,
+    "burn_in_dias": 60
+  },
+  "etapas": {
+    "datos": {
+      "universo": {
+        "A1": {
+          "nombre": "E&P / integradas",
+          "tickers": [
+            "XOM",
+            "CVX",
+            "COP",
+            "OXY",
+            "EOG",
+            "DVN"
+          ],
+          "tendencia_comun": "Nivel del crudo (WTI / Brent)",
+          "momento_registro": "Original. Registrado antes de calcular cualquier estadistico."
+        },
+        "A2": {
+          "nombre": "Refinacion",
+          "tickers": [
+            "VLO",
+            "MPC",
+            "PSX",
+            "PBF",
+            "DINO"
+          ],
+          "tendencia_comun": "Margen de refinacion (crack spread 3-2-1)",
+          "momento_registro": "Original. Registrado antes de calcular cualquier estadistico."
+        },
+        "A3": {
+          "nombre": "Servicios petroleros",
+          "tickers": [
+            "SLB",
+            "HAL",
+            "NOV",
+            "RIG"
+          ],
+          "tendencia_comun": "Ciclo global de capex upstream",
+          "momento_registro": "Reserva declarada desde el inicio, con la regla de activarse solo si A1 o A2 no producian grupos que pasaran Johansen. Se activo porque ningun grupo de A1 paso."
+        },
+        "B1": {
+          "nombre": "Bancos canadienses listados en NYSE",
+          "tickers": [
+            "RY",
+            "TD",
+            "BNS",
+            "BMO",
+            "CM"
+          ],
+          "tendencia_comun": "Ciclo de tasas del Banco de Canada y mercado hipotecario domestico",
+          "momento_registro": "Agregado DESPUES de que A1 y A3 fallaran, para poder construir el portafolio de Risk Parity de nivel B, que exige al menos dos grupos cointegrados disjuntos. Evaluado con exactamente los mismos criterios y umbrales, sin relajar ninguno."
+        }
+      },
+      "panel": {
+        "n_observaciones": 3496,
+        "n_tickers": 20,
+        "fecha_inicio": "2012-12-13",
+        "fecha_fin": "2026-11-06",
+        "anos_de_historia": 13.9,
+        "nan_rellenados": 0,
+        "retornos_extremos": 2
+      },
+      "particiones": {
+        "entrenamiento": {
+          "inicio": "2012-12-13",
+          "fin": "2021-04-14",
+          "n_dias": 2097,
+          "porcentaje": 59.98
+        },
+        "prueba": {
+          "inicio": "2021-04-15",
+          "fin": "2024-01-24",
+          "n_dias": 699,
+          "porcentaje": 19.99
+        },
+        "validacion": {
+          "inicio": "2024-01-25",
+          "fin": "2026-11-06",
+          "n_dias": 700,
+          "porcentaje": 20.02
+        }
+      },
+      "observaciones": [
+        "2 retornos diarios con valor absoluto mayor a 50%: OXY 2020-03-09 -52.0%; RIG 2020-06-05 +50.6%"
+      ],
+      "salidas": [
+        "prices.parquet",
+        "selection/particiones.csv",
+        "selection/calidad_datos.csv"
+      ]
+    },
+    "cointegracion": {
+      "m_grupos_evaluados": 26,
+      "alpha": 0.05,
+      "falsos_positivos_esperados": 1.3,
+      "n_grupos_que_pasaron": 2,
+      "descartes_por_etapa": {
+        "engle_granger": 14,
+        "correlacion": 9,
+        "operado": 2,
+        "johansen": 1
+      },
+      "grupos_operados": [
+        {
+          "pool": "A2",
+          "grupo": "VLO-MPC-PSX-PBF",
+          "tickers": [
+            "VLO",
+            "MPC",
+            "PSX",
+            "PBF"
+          ],
+          "pata_numeraria": "VLO",
+          "beta": {
+            "VLO": 1.0,
+            "MPC": -0.787266,
+            "PSX": -0.883603,
+            "PBF": 0.594516
+          },
+          "adf_pvalue": 0.000398,
+          "vida_media_dias": 37.33,
+          "johansen_rango": 1
+        },
+        {
+          "pool": "B1",
+          "grupo": "RY-TD-BMO-CM",
+          "tickers": [
+            "RY",
+            "TD",
+            "BMO",
+            "CM"
+          ],
+          "pata_numeraria": "CM",
+          "beta": {
+            "RY": -0.337766,
+            "TD": 0.562076,
+            "BMO": -0.559338,
+            "CM": 1.0
+          },
+          "adf_pvalue": 0.005645,
+          "vida_media_dias": 33.06,
+          "johansen_rango": 1
+        }
+      ],
+      "salidas": [
+        "selection/groups_tested.csv",
+        "selection/johansen_VLO-MPC-PSX-PBF.json",
+        "selection/johansen_RY-TD-BMO-CM.json",
+        "selection/vector_comparison_VLO-MPC-PSX-PBF.csv",
+        "selection/vector_comparison_RY-TD-BMO-CM.csv"
+      ]
+    },
+    "estrategia": {
+      "grupos": [
+        {
+          "grupo": "VLO-MPC-PSX-PBF",
+          "tickers": [
+            "VLO",
+            "MPC",
+            "PSX",
+            "PBF"
+          ],
+          "pata_numeraria": "VLO",
+          "filtro1": {
+            "R": 17.560952217959272,
+            "delta_elegido": 0.001,
+            "burn_in_dias": 60,
+            "diag_var_innovacion_normalizada": 2.139941495698752,
+            "diag_autocorr_lag1": 0.9812087529001475,
+            "diag_log_verosimilitud": -11980.064995855364
+          },
+          "vecm": {
+            "k_rezagos": 1,
+            "beta_alpha": -0.018879375209667742,
+            "revierte": true,
+            "phi_ect": -0.018920485131334853,
+            "vida_media_dias": 36.287069772623006,
+            "ljungbox_pvalue": 0.2780196542791328,
+            "ljungbox_rezagos": 11,
+            "residuales_blancos": true
+          },
+          "filtro2": {
+            "vida_media_entrenamiento": 36.287069772623006,
+            "multiplo_ventana": 3.0,
+            "ventana_efectiva_objetivo": 108.86120931786903,
+            "razon_Q2_R2": 4.054208504720291e-05,
+            "ganancia_estacionaria": 0.006347027910907743,
+            "rho_varianza": 0.9936529720890923,
+            "varianza_semilla": 14.784354747961995,
+            "diag_var_innovacion_normalizada": 1.1020466079027742,
+            "diag_autocorr_lag1": 0.9737497089669427,
+            "diag_z_media": 0.011589063709030503,
+            "diag_z_desviacion": 1.052835548226491
+          },
+          "umbrales": {
+            "z_entrada": 2.25,
+            "z_salida": 0.25,
+            "z_stop": 3.0,
+            "tenencia_maxima": 73
+          },
+          "ancho_banda_calibrado": 0.075,
+          "n_operaciones": 27,
+          "dias_en_mercado": 532,
+          "salidas": [
+            "kalman/filter1_VLO-MPC-PSX-PBF.parquet",
+            "kalman/calibracion_delta_VLO-MPC-PSX-PBF.csv",
+            "kalman/filter2_VLO-MPC-PSX-PBF.parquet",
+            "rolling/johansen_eigen_VLO-MPC-PSX-PBF.parquet",
+            "strategy/signals_VLO-MPC-PSX-PBF.parquet",
+            "strategy/grid_search_VLO-MPC-PSX-PBF.csv",
+            "strategy/vecm_rezagos_VLO-MPC-PSX-PBF.csv",
+            "strategy/vecm_alphas_VLO-MPC-PSX-PBF.csv",
+            "strategy/calibracion_banda_VLO-MPC-PSX-PBF.csv"
+          ]
+        },
+        {
+          "grupo": "RY-TD-BMO-CM",
+          "tickers": [
+            "RY",
+            "TD",
+            "BMO",
+            "CM"
+          ],
+          "pata_numeraria": "CM",
+          "filtro1": {
+            "R": 1.1281624779038435,
+            "delta_elegido": 0.001,
+            "burn_in_dias": 60,
+            "diag_var_innovacion_normalizada": 5.222799734681729,
+            "diag_autocorr_lag1": 0.9883283393519907,
+            "diag_log_verosimilitud": -12496.376639228327
+          },
+          "vecm": {
+            "k_rezagos": 8,
+            "beta_alpha": -0.017309292424004336,
+            "revierte": true,
+            "phi_ect": -0.019012343248892446,
+            "vida_media_dias": 36.110063621763956,
+            "ljungbox_pvalue": 0.056714024908224296,
+            "ljungbox_rezagos": 18,
+            "residuales_blancos": true
+          },
+          "filtro2": {
+            "vida_media_entrenamiento": 36.110063621763956,
+            "multiplo_ventana": 3.0,
+            "ventana_efectiva_objetivo": 108.33019086529187,
+            "razon_Q2_R2": 4.09405230764477e-05,
+            "ganancia_estacionaria": 0.006378040667424478,
+            "rho_varianza": 0.9936219593325755,
+            "varianza_semilla": 0.9831751724220824,
+            "diag_var_innovacion_normalizada": 1.146972574050331,
+            "diag_autocorr_lag1": 0.9748871172531608,
+            "diag_z_media": 0.024726256922240133,
+            "diag_z_desviacion": 1.0739529535222267
+          },
+          "umbrales": {
+            "z_entrada": 1.25,
+            "z_salida": 0.5,
+            "z_stop": 3.5,
+            "tenencia_maxima": 72
+          },
+          "ancho_banda_calibrado": 0.1,
+          "n_operaciones": 45,
+          "dias_en_mercado": 1516,
+          "salidas": [
+            "kalman/filter1_RY-TD-BMO-CM.parquet",
+            "kalman/calibracion_delta_RY-TD-BMO-CM.csv",
+            "kalman/filter2_RY-TD-BMO-CM.parquet",
+            "rolling/johansen_eigen_RY-TD-BMO-CM.parquet",
+            "strategy/signals_RY-TD-BMO-CM.parquet",
+            "strategy/grid_search_RY-TD-BMO-CM.csv",
+            "strategy/vecm_rezagos_RY-TD-BMO-CM.csv",
+            "strategy/vecm_alphas_RY-TD-BMO-CM.csv",
+            "strategy/calibracion_banda_RY-TD-BMO-CM.csv"
+          ]
+        }
+      ]
+    },
+    "portafolio": {
+      "grupos": [
+        "VLO-MPC-PSX-PBF",
+        "RY-TD-BMO-CM"
+      ],
+      "pesos_risk_parity": {
+        "VLO-MPC-PSX-PBF": 0.3056790370468779,
+        "RY-TD-BMO-CM": 0.6943209629531221
+      },
+      "pesos_iguales": {
+        "VLO-MPC-PSX-PBF": 0.5,
+        "RY-TD-BMO-CM": 0.5
+      },
+      "contribuciones_al_riesgo": {
+        "VLO-MPC-PSX-PBF": 0.5,
+        "RY-TD-BMO-CM": 0.5
+      },
+      "desvio_maximo_contribuciones": 0.0,
+      "tolerancia": 1e-06,
+      "contribuciones_iguales": true,
+      "iteraciones_risk_parity": 5,
+      "correlacion_spreads": {
+        "VLO-MPC-PSX-PBF": {
+          "VLO-MPC-PSX-PBF": 1.0,
+          "RY-TD-BMO-CM": -0.085714
+        },
+        "RY-TD-BMO-CM": {
+          "VLO-MPC-PSX-PBF": -0.085714,
+          "RY-TD-BMO-CM": 1.0
+        }
+      },
+      "capital_final_consolidado": 1034057.4886083145,
+      "capital_final_pesos_iguales": 1102721.8899891363,
+      "capital_final_por_grupo": {
+        "VLO-MPC-PSX-PBF": 1295559.9220944021,
+        "RY-TD-BMO-CM": 932804.5972720897
+      },
+      "exposicion_bruta_maxima": 0.8069056264748223,
+      "salidas": [
+        "backtest/portfolio_equity.parquet",
+        "backtest/equity_equal_weight.parquet",
+        "backtest/group_equity_VLO-MPC-PSX-PBF.parquet",
+        "backtest/legs_ledger_VLO-MPC-PSX-PBF.parquet",
+        "backtest/trades_VLO-MPC-PSX-PBF.csv",
+        "backtest/group_equity_RY-TD-BMO-CM.parquet",
+        "backtest/legs_ledger_RY-TD-BMO-CM.parquet",
+        "backtest/trades_RY-TD-BMO-CM.csv",
+        "backtest/trades_consolidado_pesos_iguales.csv",
+        "backtest/trades_grupo_VLO-MPC-PSX-PBF.csv",
+        "backtest/trades_grupo_RY-TD-BMO-CM.csv",
+        "backtest/trades_all.csv",
+        "backtest/legs_ledger_consolidado.parquet",
+        "backtest/rebalance_comparison.csv",
+        "riskparity/weights.csv",
+        "riskparity/spread_returns.parquet",
+        "riskparity/spread_corr.csv",
+        "riskparity/spread_cov.csv"
+      ]
+    },
+    "desempeno": {
+      "metricas": {
+        "consolidado_risk_parity": {
+          "global": {
+            "capital_final": 1034057.4886083145,
+            "retorno_total": 0.03405748860831448,
+            "sharpe": 0.13362873150779758,
+            "sortino": 0.18429950284860191,
+            "calmar": 0.02165538693432864,
+            "max_drawdown": -0.1116111194300008,
+            "win_rate": 0.6111111111111112,
+            "profit_factor": 1.1443237365604424,
+            "n_operaciones": 72
+          },
+          "entrenamiento": {
+            "capital_final": 1134045.0510899564,
+            "retorno_total": 0.13404505108995646,
+            "sharpe": 0.9320806341223449,
+            "sortino": 1.4840219448522194,
+            "calmar": 0.8808423080625116,
+            "max_drawdown": -0.01729178878523152,
+            "win_rate": 0.7631578947368421,
+            "profit_factor": 3.799126109286704,
+            "n_operaciones": 38
+          },
+          "prueba": {
+            "capital_final": 1104616.186773606,
+            "retorno_total": -0.02595034852280831,
+            "sharpe": -0.4102821200819436,
+            "sortino": -0.5204821247609378,
+            "calmar": -0.1634966305973202,
+            "max_drawdown": -0.05770294489674299,
+            "win_rate": 0.42105263157894735,
+            "profit_factor": 0.41364209935315427,
+            "n_operaciones": 19
+          },
+          "validacion": {
+            "capital_final": 1034057.4886083145,
+            "retorno_total": -0.06387621239860819,
+            "sharpe": -0.9694506116794206,
+            "sortino": -1.2250283007659188,
+            "calmar": -0.3303255030043225,
+            "max_drawdown": -0.07108930697107341,
+            "win_rate": 0.4666666666666667,
+            "profit_factor": 0.54218524021038,
+            "n_operaciones": 15
+          }
+        },
+        "consolidado_pesos_iguales": {
+          "global": {
+            "capital_final": 1102721.8899891363,
+            "retorno_total": 0.10272188998913623,
+            "sharpe": 0.36251514024195,
+            "sortino": 0.5367640441904017,
+            "calmar": 0.07507501075398694,
+            "max_drawdown": -0.0942154525903276,
+            "win_rate": 0.6111111111111112,
+            "profit_factor": 1.466608990702686,
+            "n_operaciones": 72
+          },
+          "entrenamiento": {
+            "capital_final": 1178275.3056461867,
+            "retorno_total": 0.17827530564618677,
+            "sharpe": 1.0319644700990076,
+            "sortino": 1.7362190812109477,
+            "calmar": 0.953961331318646,
+            "max_drawdown": -0.020870852978135512,
+            "win_rate": 0.7631578947368421,
+            "profit_factor": 4.4755530718417,
+            "n_operaciones": 38
+          },
+          "prueba": {
+            "capital_final": 1142447.0743854458,
+            "retorno_total": -0.030407351396617877,
+            "sharpe": -0.5106271986908872,
+            "sortino": -0.6534356892560929,
+            "calmar": -0.20445402261601997,
+            "max_drawdown": -0.0541476050501013,
+            "win_rate": 0.42105263157894735,
+            "profit_factor": 0.3929802172923708,
+            "n_operaciones": 19
+          },
+          "validacion": {
+            "capital_final": 1102721.8899891363,
+            "retorno_total": -0.03477201288968146,
+            "sharpe": -0.6087417736421745,
+            "sortino": -0.8103575664199975,
+            "calmar": -0.23531150689668914,
+            "max_drawdown": -0.05380069306853785,
+            "win_rate": 0.4666666666666667,
+            "profit_factor": 0.7970003459329946,
+            "n_operaciones": 15
+          }
+        },
+        "grupo_VLO-MPC-PSX-PBF": {
+          "global": {
+            "capital_final": 1295559.9220944021,
+            "retorno_total": 0.29555992209440207,
+            "sharpe": 0.6012765500135132,
+            "sortino": 0.9718585282444725,
+            "calmar": 0.27318738279381183,
+            "max_drawdown": -0.06896552037815573,
+            "win_rate": 0.5185185185185185,
+            "profit_factor": 2.7254557966902953,
+            "n_operaciones": 27
+          },
+          "entrenamiento": {
+            "capital_final": 1296993.9403587137,
+            "retorno_total": 0.2969939403587136,
+            "sharpe": 0.9283985340945621,
+            "sortino": 1.5995517521980933,
+            "calmar": 0.7303467397915316,
+            "max_drawdown": -0.043464254605857344,
+            "win_rate": 0.6923076923076923,
+            "profit_factor": 5.871130972853312,
+            "n_operaciones": 13
+          },
+          "prueba": {
+            "capital_final": 1241570.6202587474,
+            "retorno_total": -0.04273213495865502,
+            "sharpe": -0.4936224168250211,
+            "sortino": -0.6555717114692611,
+            "calmar": -0.2265063149520444,
+            "max_drawdown": -0.06896552037815573,
+            "win_rate": 0.14285714285714285,
+            "profit_factor": 0.3048349903623324,
+            "n_operaciones": 7
+          },
+          "validacion": {
+            "capital_final": 1295559.9220944021,
+            "retorno_total": 0.04348468057693178,
+            "sharpe": 0.6400074665564192,
+            "sortino": 1.0642629689575174,
+            "calmar": 0.6332330540787661,
+            "max_drawdown": -0.02438546979784806,
+            "win_rate": 0.5714285714285714,
+            "profit_factor": 3.263038699312298,
+            "n_operaciones": 7
+          }
+        },
+        "grupo_RY-TD-BMO-CM": {
+          "global": {
+            "capital_final": 932804.5972720897,
+            "retorno_total": -0.06719540272791036,
+            "sharpe": -0.19285983198033407,
+            "sortino": -0.2540276273547697,
+            "calmar": -0.03333197143532881,
+            "max_drawdown": -0.15005015920574571,
+            "win_rate": 0.6666666666666666,
+            "profit_factor": 0.7390754845435735,
+            "n_operaciones": 45
+          },
+          "entrenamiento": {
+            "capital_final": 1066629.380600292,
+            "retorno_total": 0.066629380600292,
+            "sharpe": 0.4293260752486519,
+            "sortino": 0.6263036767724259,
+            "calmar": 0.24049569393728254,
+            "max_drawdown": -0.03235659603629881,
+            "win_rate": 0.8,
+            "profit_factor": 2.5524198969563257,
+            "n_operaciones": 25
+          },
+          "prueba": {
+            "capital_final": 1046013.8664919565,
+            "retorno_total": -0.019327720090302813,
+            "sharpe": -0.22522445893832468,
+            "sortino": -0.2871866651577154,
+            "calmar": -0.10347755679825772,
+            "max_drawdown": -0.0677582216074415,
+            "win_rate": 0.5833333333333334,
+            "profit_factor": 0.43660189285489276,
+            "n_operaciones": 12
+          },
+          "validacion": {
+            "capital_final": 932804.5972720897,
+            "retorno_total": -0.10822922414933145,
+            "sharpe": -1.2258976036308422,
+            "sortino": -1.5236917414256739,
+            "calmar": -0.3685648750953867,
+            "max_drawdown": -0.10960880269126361,
+            "win_rate": 0.375,
+            "profit_factor": 0.30560509456694546,
+            "n_operaciones": 8
+          }
+        }
+      },
+      "atribucion_costos_global": {
+        "particion": "global",
+        "pnl_bruto": 137394.6,
+        "comisiones": 98000.3,
+        "prestamo": 5336.82,
+        "pnl_neto": 34057.49,
+        "residuo_identidad": -0.0,
+        "costos_sobre_bruto": 0.752119,
+        "costos_sobre_capital_medio": 0.095806
+      },
+      "ventana_max_drawdown": {
+        "fecha_pico": "2022-03-16",
+        "fecha_valle": "2025-07-28",
+        "drawdown": -0.1116111194300008,
+        "dias_habiles": 843
+      },
+      "atribucion_drawdown": [
+        {
+          "grupo": "VLO-MPC-PSX-PBF",
+          "pnl_neto_en_ventana": -17170.67,
+          "fraccion_de_la_caida": 0.133186
+        },
+        {
+          "grupo": "RY-TD-BMO-CM",
+          "pnl_neto_en_ventana": -111751.93,
+          "fraccion_de_la_caida": 0.866814
+        }
+      ],
+      "figuras": [
+        "figures/fig01_precios.png",
+        "figures/fig02_spread_senales.png",
+        "figures/fig03_vector_pesos.png",
+        "figures/fig04_primer_eigenvector.png",
+        "figures/fig05_ganancias_kalman.png",
+        "figures/fig06_zscore.png",
+        "figures/fig07_curvas_capital.png",
+        "figures/fig08_distribucion_retornos.png",
+        "figures/fig09_risk_parity.png"
+      ],
+      "salidas": [
+        "performance/metrics.json",
+        "performance/rolling_sharpe.parquet",
+        "performance/cost_attribution.csv",
+        "performance/cost_attribution_por_grupo.csv",
+        "performance/drawdown_attribution.csv",
+        "figures/fig01_precios.png",
+        "figures/fig02_spread_senales.png",
+        "figures/fig03_vector_pesos.png",
+        "figures/fig04_primer_eigenvector.png",
+        "figures/fig05_ganancias_kalman.png",
+        "figures/fig06_zscore.png",
+        "figures/fig07_curvas_capital.png",
+        "figures/fig08_distribucion_retornos.png",
+        "figures/fig09_risk_parity.png"
+      ]
+    },
+    "ejemplo_numerico": {
+      "salidas": [
+        "kalman/worked_example_filtro1_VLO-MPC-PSX-PBF.csv",
+        "kalman/worked_example_filtro2_VLO-MPC-PSX-PBF.csv",
+        "kalman/worked_example_filtro1_RY-TD-BMO-CM.csv",
+        "kalman/worked_example_filtro2_RY-TD-BMO-CM.csv"
+      ]
+    }
+  }
+}
