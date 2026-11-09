@@ -1,0 +1,36 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ---- Herramientas ----
+.pytest_cache/
+.ipynb_checkpoints/
+.streamlit/
+*.log
+
+# ---- Intermedios del generador de PDF ----
+docs/_build_reporte/
+
+# ---- Material de estudio interno (no se entrega) ----
+estudio/
+
+# ---- Instrucciones internas de trabajo y material de referencia del curso ----
+claude.md
+docs/Lab03.pdf
+docs/TRADING.pdf
+
+# ---- Sistema operativo / editores ----
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# NOTA DELIBERADA: artifacts/ y data/precios_snapshot.parquet SI se versionan.
+# El snapshot congela los precios porque yfinance recalcula el cierre ajustado
+# hacia atras con cada dividendo, y artifacts/ se versiona para que el dashboard
+# abra sin tener que correr el pipeline. Ver la seccion de reproducibilidad del
+# README.
